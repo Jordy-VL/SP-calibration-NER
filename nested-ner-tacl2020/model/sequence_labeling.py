@@ -162,7 +162,6 @@ class BiRecurrentConvCRF4NestedNER(nn.Module):
             preds_batch, energy_batch = crf.decode(output, mask=mask)
 
             #why K CRFs?
-
             #energy_batch.shape
             #B x L x K x K
             #torch.Size([32, 91, 7, 7])
