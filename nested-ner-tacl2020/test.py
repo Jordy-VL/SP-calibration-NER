@@ -89,9 +89,6 @@ for token_iv_batch, token_ooev_batch, char_batch, label_batch, mask_batch in bat
     probs = torch.nn.functional.softmax(logits,dim=-1)
     import pdb; pdb.set_trace()  # breakpoint 929d7903 //
 
-    #ner_model._get_rnn_output(token_iv_batch_var,token_ooev_batch_var,char_batch_var,mask_batch_var).shape
-    #torch.Size([32, 91, 512])
-
     pred_entities = unpack_prediction(ner_model, pred_sequence_entities) #SPANS
     #[(start, end, label)] for each example
 

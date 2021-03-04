@@ -37,7 +37,7 @@ class Config:
 
         # for training
         self.embed_path: str = self.root_path + "/data/word_vec_{}.pkl".format(self.data_set)
-        self.epoch: int = 10 #500
+        self.epoch: int = 500
         self.if_gpu: bool = False
         self.opt: Optimizer = Optimizer.AdaBound
         self.lr: float = 0.001 if self.opt != Optimizer.SGD else 0.1
