@@ -1,11 +1,20 @@
 # README #
 
+Meta-repository in which I keep environments and repositories
+from which to obtain trained predictors where to estimate SCE on.
+
 ## Goals
 
 1. keep repositories, 
 2. within each keep trained models
 3. within each make a predict / logits script
 4. align data loaders to compare at instance-level between models
+
+
+### Nested NER TACL
+
+1. second best decoding 
+2. have to adapt to Transformers
 
 
 # setup a virtualenv for each repository:

@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "cortex"
+name = "SP-calibration-NER"
 version = "0.1.0"
-description = "GNN experiments library with prototypes"
-authors = ["Shikhar <shikhar@contract.fit>"]
+description = "experiments for reproducing nested NER"
+authors = ["jordy <jordy@contract.fit>"]
 
 readme = 'README.md'  # Markdown files are supported
 keywords = ['research', 'Artificial Intelligence',
