@@ -18,6 +18,7 @@ class NestedSequenceLabel:
         self.end = end
         self.label = label
         self.children = children
+        #could add length-norm probability
 
 
 class BiRecurrentConvCRF4NestedNER(nn.Module):
@@ -41,6 +42,7 @@ class BiRecurrentConvCRF4NestedNER(nn.Module):
             for name, parameter in self.bert.named_parameters():
                 parameter.requires_grad = False
             self.bert.encoder.output_hidden_states = True
+            self.bert.config.output_hidden_states = True
         # standard dropout
         self.dropout_out: nn.Dropout2d = nn.Dropout2d(p=lstm_dropout)
 
@@ -71,7 +73,7 @@ class BiRecurrentConvCRF4NestedNER(nn.Module):
         self.o_id: int = 4
         self.eos_id: int = 5
 
-    def reset_parameters(self) -> None:
+    def reset_parameters(self) -> None: #fancy initialization
         for name, parameter in self.rnn.named_parameters():
             nn.init.constant_(parameter, 0.)
             if name.find('weight_ih') > 0:

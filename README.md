@@ -14,7 +14,27 @@ from which to obtain trained predictors where to estimate SCE on.
 ### Nested NER TACL
 
 1. second best decoding 
+
+We need to get some logit space that stands for all possible label sequences
+So N_test x L x K x K
+% x K #nesting depth, at most K 
+
+Combination-wise: L^(K x K)
+
+=> use K-level CRFs for decoding, so average the energy over K CRFs.
+
+These are now our logits!
+The decoding and predictions are special in its own right, will have to use the repo :/
+=> check which elements required to form TouristLeMC object
+
+% have to create a new object containing this?
+% can simplify a lot [only nonbayesian]
+%% whatever gets me started fastest
+%%% also will have to create a vector/tensor representing y_true & correctness 
+
 2. have to adapt to Transformers
+
+
 
 
 # setup a virtualenv for each repository:
@@ -22,6 +42,7 @@ from which to obtain trained predictors where to estimate SCE on.
 ######################################
 
 var="XXX"
+% https://git-scm.com/book/en/v2/Git-Tools-Submodules
 
 1. install virtualenv $var
 
