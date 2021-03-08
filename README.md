@@ -16,7 +16,9 @@ from which to obtain trained predictors where to estimate SCE on.
 1. second best decoding 
 
 We need to get some logit space that stands for all possible label sequences
-So N_test x L x K x K
+So 
+
+N_test x L x K x K
 % x K #nesting depth, at most K 
 
 Combination-wise: L^(K x K)
@@ -34,8 +36,35 @@ The decoding and predictions are special in its own right, will have to use the 
 
 2. have to adapt to Transformers
 
+----
+
+### Seq2Seq NER (ACL 2019)
+
+1. already converted ACE to conll format
+2. next step to get embeddings
+
+This: https://github.com/Adaxry/get_aligned_BERT_emb 
+might come in handy
+
+3. 
+
+----
 
 
+## Data Preprocessing 
+
+1. XML format (original)
+2. nested format (secondbest-decoding-NER)
+3. conll format (seq2seq-NER)
+4. jsonlines format (biaffine-NER)
+5. (rasa NLU format) (pyramid-NER)
+
+Have converters from 1-2, 2-3. 
+
+
+### Created virtual env TF1
+
+---
 
 # setup a virtualenv for each repository:
 
