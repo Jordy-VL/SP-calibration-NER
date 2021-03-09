@@ -21,7 +21,9 @@ class Task:
         print("Loading data...")
         if data_name == "wiki":
             words_train, mentions_train, positions_train, labels_train = data_utils.load(config.WIKI_TRAIN_CLEAN)
-            #words_train, mentions_train, positions_train, labels_train = words_train[:95], mentions_train[:95], positions_train[:95], labels_train[:95]
+
+            words_train, mentions_train, positions_train, labels_train = words_train[:95], mentions_train[:95], positions_train[:95], labels_train[:95]
+
             words, mentions, positions, labels = data_utils.load(config.WIKI_TEST_CLEAN)
             type2id, typeDict = pkl_utils._load(config.WIKI_TYPE)
             num_types = len(type2id)
