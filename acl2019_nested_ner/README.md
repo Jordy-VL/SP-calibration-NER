@@ -34,7 +34,10 @@ Please cite as:
 ## How I will run it?
 
 
-./tagger.py --corpus=data/ace2004 --train_data=data/ace2004/train_dev_bilou.conll --test_data=data/ace2004/test_bilou.conll --decoding=seq2seq --epochs=10:1e-3,8:1e-4 --name=seq2seq
+./tagger.py --corpus=ACE2004 --train_data=data/ace2004/train.biluo.conll --dev_data=data/ace2004/dev.biluo.conll --test_data=data/ace2004/test.biluo.conll --decoding=seq2seq --epochs=1:1e-3 --name=seq2seq
+
+
+%1:10e-3,8:1e-4
 
 +ELMo+BERT+Flair 
 --form_wes_model=word_embeddings/data/ace2004_form.txt --lemma_wes_model=word_embeddings/data/ace2004_lemma.txt --bert_embeddings_train=bert_embeddings/data/ace2004_train_dev_bert_large_embeddings.txt --bert_embeddings_test=bert_embeddings/data/ace2004_test_bert_large_embeddings.txt --flair_train=flair_embeddings/data/ace2004_train_dev.txt --flair_test=flair_embeddings/data/ace2004_test.txt --elmo_train=elmo_embeddings/data/ace2004_train_dev.txt --elmo_test=elmo_embeddings/data/ace2004_test.txt 
@@ -45,13 +48,30 @@ data_dir=data/ace2004
 Could write a script in which to for a CONLL file, output all embeddings
 -> use flair?
 https://github.com/flairNLP/flair/blob/master/resources/docs/TUTORIAL_9_TRAINING_LM_EMBEDDINGS.md
+
 <!---
 A text file with one token per
   line, first column is the token, all other columns are the vector real valued
   numbers; columns separated with space.
 -->
 
+##### TF1 and new CUDA 
 
+```python
+from tensorflow.python.client import device_lib
+
+def get_available_gpus():
+    local_device_protos = device_lib.list_local_devices()
+    return [x.name for x in local_device_protos if x.device_type == 'GPU']
+
+get_available_gpus()
+```
+
+sudo ln -s /usr/local/cuda-10.1/targets/x86_64-linux/lib/libcublas.so.10.1.1.243 /usr/local/cuda-10.1/lib64/libcublas.so.10.0
+sudo ln -s /usr/local/cuda-10.1/targets/x86_64-linux/lib/libcusolver.so.10.1.243 /usr/local/cuda-10.1/lib64/libcusolver.so.10.0 
+sudo ln -s /usr/local/cuda-10.1/targets/x86_64-linux/lib/libcudart.so.10.1.243 /usr/local/cuda-10.1/lib64/libcudart.so.10.0 
+
+-> still did not work... #giving up for now, is a time waste; let's run on CPU first
 
 
 How to run the tagger

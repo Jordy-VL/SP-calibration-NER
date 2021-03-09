@@ -131,3 +131,6 @@ dmypy.json
 
 # Datasets in prepped format
 data/
+ACE2004/
+ace2004/
+ACE04/

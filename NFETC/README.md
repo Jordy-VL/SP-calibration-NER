@@ -13,10 +13,12 @@ python3 task.py -m $model -d $data -e 100 -c 1
 
 %%%-e <max_evals> -c <cv_runs>
 
+# Got it training :) 3h
+
 ### models
 
 (1) NFETC(f): basic neural model trained on Dfiltered (recall Section 4.4);
-(2) NFETC-hier(f): neural model with hierarichcal loss normalization trained on Dfiltered. (3)
+(2) NFETC-hier(f): neural model with hierarchical loss normalization trained on Dfiltered. (3)
 NFETC(r): neural model with proposed variant of cross-entropy loss trained on Draw; (4)
 NFETC-hier(r): neural model with proposed variant of cross-entropy loss and hierarchical loss
 normalization trained on Draw.
