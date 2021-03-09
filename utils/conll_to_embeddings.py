@@ -35,8 +35,8 @@ def infer_split(filename):
     filename = os.path.basename(filename)
     if "train" in filename:
         return "train"
-    elif "dev" in filename or "val" in "filename":
-        return "validation"
+    elif "dev" in filename or "val" in filename:
+        return "dev"
     elif "test" in filename:
         return "test"
 
@@ -78,11 +78,10 @@ def main(directory, embeddings, strategy):
     # 1. find corpora in data directory
     corpora = {"train": None, "dev": None, "test": None}
     for labelset in corpora:
-        for file in os.listdir(directory):
+        for file in sorted(os.listdir(directory)):
             if infer_split(file) == labelset:
-                corpora[labelset] = pd.read_csv(os.path.join(directory, file), sep="\t", names=["text","pos","lemma","label"], engine="python", error_bad_lines=False, quoting=csv.QUOTE_NONE)
+                corpora[labelset] = pd.read_csv(os.path.join(directory, file), sep="\t", names=["text","pos","lemma","label"], engine="python", error_bad_lines=False, quoting=csv.QUOTE_NONE).fillna("")
                 break
-    
 
     if embeddings == "elmo":
         embedder = ELMoEmbeddings("original")
@@ -92,17 +91,23 @@ def main(directory, embeddings, strategy):
         embedder = TransformerWordEmbeddings('bert-base-cased')
 
     embeddings_dir = os.path.join(directory, embeddings+ "_embeddings")
-    os.makedirs(embeddings_dir, exist_ok=True)
+    if not os.path.exists(embeddings_dir):
+        os.makedirs(embeddings_dir, exist_ok=True)
 
     strategy = np.mean if strategy == "mean" else np.max if strategy == "max" else np.sum if strategy == "sum" else None
 
     for labelset, corpus in corpora.items():
+        if corpus is None:
+            print(f"empty corpus: {labelset}")
+            continue
         voc = sorted(corpus["text"].unique())
         print(f"Unique tokens: {len(voc)}")
 
         with open(os.path.join(embeddings_dir, labelset+".w2v"), "w") as f:
             for word in voc:
                 sentence = Sentence(word)
+                if len(sentence) == 0:
+                    continue
                 embedder.embed(sentence)
                 token_embedding = strategy([token.embedding.cpu().numpy() for token in sentence],axis=0) 
                 f.write(word + " " + " ".join([str(num) for num in token_embedding.tolist()]) + '\n')
@@ -116,13 +121,15 @@ if __name__ == '__main__':
         "-e",
         dest="embeddings",
         type=str,
-        choice=["elmo", "flair", "bert"],
+        choices=["elmo", "flair", "bert"],
     )
     parser.add_argument(
         "-s",
         dest="strategy",
         type=str,
         default="mean",
-        choice=["mean", "max", "sum"],
+        choices=["mean", "max", "sum"],
     )
+    args = parser.parse_args()
+
     main(args.directory, args.embeddings, args.strategy)
