@@ -21,6 +21,7 @@ class Task:
         print("Loading data...")
         if data_name == "wiki":
             words_train, mentions_train, positions_train, labels_train = data_utils.load(config.WIKI_TRAIN_CLEAN)
+            #words_train, mentions_train, positions_train, labels_train = words_train[:95], mentions_train[:95], positions_train[:95], labels_train[:95]
             words, mentions, positions, labels = data_utils.load(config.WIKI_TEST_CLEAN)
             type2id, typeDict = pkl_utils._load(config.WIKI_TYPE)
             num_types = len(type2id)
@@ -210,10 +211,12 @@ class Task:
         accs = []
         macros = []
         micros = []
+        keep = []
         for i in range(self.cv_runs):
             sess = self.create_session()
             sess.run(tf.global_variables_initializer())
             self.model.fit(sess, self.train_set)
+
             if full:
                 preds = self.model.predict(sess, self.full_test_set)
                 acc, macro, micro = self.get_scores(preds, True)
@@ -258,6 +261,7 @@ class TaskOptimizer:
         param_dict = self.model_param_space._convert_into_param(param_dict)
         self.task = Task(self.model_name, self.data_name, self.cv_runs, param_dict, self.logger)
         self.task.cv()
+        #self.task.save()
         tf.reset_default_graph()
         ret = {
             "loss": -self.task.eacc,
@@ -284,6 +288,7 @@ class TaskOptimizer:
         self.logger.info("Best Param:")
         self.task._print_param_dict(best_params)
         self.logger.info("-" * 50)
+        #self.task.save()
 
 def parse_args(parser):
     parser.add_option("-m", "--model", type="string", dest="model_name")

@@ -20,6 +20,7 @@ def get_types(model_name, input_file, output_file):
 	id2type = {type2id[x]:x for x in type2id.keys()}
 
 	df = pd.read_csv(input_file, sep="\t", names=["r", "e1", "x1", "y1", "e2", "x2", "y2", "s"]) 
+
 	n = df.shape[0]
 	words1 = np.array(df.s)
 	mentions1 = np.array(df.e1)

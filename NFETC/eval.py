@@ -29,7 +29,7 @@ def main(options):
         logger = logging_utils._get_logger(config.LOG_DIR, logname)
         # logger = logging.getLogger()
         # logging.basicConfig(format='[%(asctime)s] %(levelname)s: %(message)s', level=logging.INFO)
-    params_dict = param_space_dict[options.model_name]
+    params_dict = param_space_dict[options.model_name]    
     task = Task(options.model_name, options.data_name, options.runs, params_dict, logger)
     if options.save:
         task.save()

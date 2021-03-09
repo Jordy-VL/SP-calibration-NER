@@ -6,30 +6,30 @@ Paper Published in NAACL 2018: [NFETC](https://arxiv.org/abs/1803.03378)
 
 
 ## how to run
-data=wiki
-model="nfetc"
 python3 preprocess.py -d $data #-c
-python3 task.py -m $model -d $data -e 100 -c 1
+data=wiki; model="nfetc"; python3 task.py -m $model -d $data -e 1 -c 1
 
 %%%-e <max_evals> -c <cv_runs>
+
+python3 eval.py -m best_nfetc_wiki -d wiki -r 1
 
 # Got it training :) 3h
 
 ### models
 
 (1) NFETC(f): basic neural model trained on Dfiltered (recall Section 4.4);
-(2) NFETC-hier(f): neural model with hierarchical loss normalization trained on Dfiltered. (3)
-NFETC(r): neural model with proposed variant of cross-entropy loss trained on Draw; (4)
-NFETC-hier(r): neural model with proposed variant of cross-entropy loss and hierarchical loss
+(2) NFETC-hier(f): neural model with hierarchical loss normalization trained on Dfiltered. 
+(3) NFETC(r): neural model with proposed variant of cross-entropy loss trained on Draw; 
+(4) NFETC-hier(r): neural model with proposed variant of cross-entropy loss and hierarchical loss
 normalization trained on Draw.
 
 
 #### small fixes
 pip3 install pickle5
-
 %python3 -m gensim.scripts.glove2word2vec --input data/glove.840B.300d.txt --output data/glove.840B.300d.w2vformat.txt
 
-
+### Have to save 
+py eval.py -m best_nfetc_wiki -d wiki -r 1 --save
 
 ---------------------------------------------------------------------
 
