@@ -103,7 +103,7 @@ def preprocess(data_name, if_clean=False, full_path=False):
         p2 = df["p2"][i]
         text = df["text"][i]
         types = df["type"][i].split()
-        if (not path_count(types) == 1) and if_clean:
+        if (not path_count(types) == 1) and if_clean: #-> RAW
             continue
 
         text = clear_text(text)
@@ -143,6 +143,54 @@ def preprocess(data_name, if_clean=False, full_path=False):
             else:
                 outfile.write("%d\t%d\t%s\t%s\t%s\n" % (p1, p2, text, mention, " ".join(out_type)))
     outfile.close()
+
+    #VALIDATION separate
+    df = pd.read_csv(raw_valid_file, sep="\t", names=["p1", "p2", "text", "type", "f"])
+    outfile = open(clean_train_file.replace("train","dev"), "w")
+    size = df.shape[0]
+    for i in range(size):
+        p1 = df["p1"][i]
+        p2 = df["p2"][i]
+        text = df["text"][i]
+        types = df["type"][i].split()
+
+        text = clear_text(text)
+        tokens = text.split()
+        if p1 >= len(tokens):
+            continue
+        mention = " ".join(tokens[p1:p2])
+
+        if p1 == 0:
+            mention = "<PAD> " + mention
+        else:
+            mention = tokens[p1 - 1] + " " + mention
+        if p2 >= len(tokens):
+            mention = mention + " <PAD>"
+        else:
+            mention = mention + " " + tokens[p2]
+
+        offset = max(0, p1 - config.WINDOW_SIZE)
+        text = " ".join(tokens[offset:min(len(tokens), p2 + config.WINDOW_SIZE - 1)])
+        p1 -= offset
+        p2 -= offset
+
+        out_type = []
+        for a in types:
+            flag = True
+            for b in types:
+                if len(a) >= len(b):
+                    continue
+                if (a == b[:len(a)]) and (b[len(a)] == "/"):
+                    flag = False
+            if flag:
+                out_type.append(a)
+
+        if full_path:
+            outfile.write("%d\t%d\t%s\t%s\t%s\n" % (p1, p2, text, mention, " ".join(types)))
+        else:
+            outfile.write("%d\t%d\t%s\t%s\t%s\n" % (p1, p2, text, mention, " ".join(out_type)))
+    outfile.close()
+
 
     df = pd.read_csv(raw_test_file, sep="\t", names=["p1", "p2", "text", "type", "f"])
     size = df.shape[0]
@@ -192,8 +240,8 @@ def preprocess(data_name, if_clean=False, full_path=False):
 
 def parse_args(parser):
     parser.add_option("-d", "--data_name", type="string", dest="data_name")
-    parser.add_option("-c", default=False, action="store_true", dest="if_clean")
-    parser.add_option("-f", default=False, action="store_true", dest="full_path")
+    parser.add_option("-c", default=False, action="store_true", dest="if_clean") #RAW when false
+    parser.add_option("-f", default=False, action="store_true", dest="full_path") #RAW?
 
     (options, args) = parser.parse_args()
     return options, args

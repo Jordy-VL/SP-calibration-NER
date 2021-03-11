@@ -32,10 +32,6 @@ def main(options):
     params_dict = param_space_dict[options.model_name]    
     task = Task(options.model_name, options.data_name, options.runs, params_dict, logger)
 
-
-    import pdb; pdb.set_trace()  # breakpoint 0c37bca4 //
-
-
     if options.save:
         task.save()
     else:

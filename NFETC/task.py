@@ -218,8 +218,6 @@ class Task:
         for i in range(self.cv_runs):
             sess = self.create_session()
             sess.run(tf.global_variables_initializer())
-            import pdb; pdb.set_trace()  # breakpoint 63e438c7 //
-
             #self.model.fit(sess, self.train_set)
 
             if full:

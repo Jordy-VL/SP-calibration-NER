@@ -11,9 +11,19 @@ data=wiki; model="nfetc"; python3 task.py -m $model -d $data -e 1 -c 1
 
 %%%-e <max_evals> -c <cv_runs>
 
-python3 eval.py -m best_nfetc_wiki -d wiki -r 1
+python3 eval.py -m best_nfetc_wiki -d wiki -r 1 --save
 
-# Got it training :) 3h
+best_nfetc_wiki_hier
+
+#filtered
+python3 preprocess.py -d wiki -c
+
+#raw
+python3 preprocess.py -d wiki
+
+------------------------
+
+# Got it training :) 3h/6h
 
 ### models
 
@@ -30,6 +40,11 @@ pip3 install pickle5
 
 ### Have to save 
 py eval.py -m best_nfetc_wiki -d wiki -r 1 --save
+
+--------------------------------------
+### Prediction script
+python3 predict.py -m best_nfetc_wiki --input data/corpus/Wiki/test_clean.tsv --dev data/corpus/Wiki/dev_clean.tsv
+
 
 ---------------------------------------------------------------------
 
