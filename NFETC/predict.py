@@ -14,14 +14,22 @@ def parse_args(parser):
 	options, args = parser.parse_args()
 	return options, args
 
-def get_types(model_name, input_file, output_file):
+def get_types(model_name, input_file, output_file, options):
+	#from model_param_space import param_space_dict
+    # params_dict = param_space_dict[options.model_name]    
+    # task = Task(options.model_name, options.data_name, options.runs, params_dict, None)
+
 	checkpoint_file = os.path.join(config.CHECKPOINT_DIR, model_name)
 	type2id, typeDict = pkl_utils._load(config.WIKI_TYPE)
 	id2type = {type2id[x]:x for x in type2id.keys()}
 
+	#different way? -> data is different!
+	words, mentions, positions, labels = data_utils.load(input_file)
+
+	n = len(words)
+	"""
 	df = pd.read_csv(input_file, sep="\t", names=["r", "e1", "x1", "y1", "e2", "x2", "y2", "s"]) 
 
-	n = df.shape[0]
 	words1 = np.array(df.s)
 	mentions1 = np.array(df.e1)
 	positions1 = np.array([[x, y] for x, y in zip(df.x1, df.y1+1)])
@@ -33,6 +41,8 @@ def get_types(model_name, input_file, output_file):
 	mentions = np.concatenate([mentions1, mentions2])
 	positions = np.concatenate([positions1, positions2])
 
+	"""
+
 	embedding = embedding_utils.Embedding.restore(checkpoint_file)
 
 	textlen = np.array([embedding.len_transform1(x) for x in words])
@@ -40,7 +50,8 @@ def get_types(model_name, input_file, output_file):
 	mentionlen = np.array([embedding.len_transform2(x) for x in mentions])
 	mentions = np.array([embedding.text_transform2(x) for x in mentions])
 	positions = np.array([embedding.position_transform(x) for x in positions])
-	labels = np.zeros(2*n)
+	#labels = np.zeros(2*n)
+
 	test_set = list(zip(words, textlen, mentions, mentionlen, positions, labels))
 
 	graph = tf.Graph()
@@ -60,7 +71,17 @@ def get_types(model_name, input_file, output_file):
 
 		pred_op = graph.get_operation_by_name("output/predictions").outputs[0]
 		batches = data_utils.batch_iter(test_set, 512, 1, shuffle=False)
+		logit_op = graph.get_operation_by_name("output/proba").outputs[0] #proba
+		score_op = graph.get_operation_by_name("output/scores").outputs[0] #proba
+		tune_op = graph.get_operation_by_name("tune").outputs[0] # K x K
+
+		ops = {"logits": "output/scores",##logits
+			   "predicted": "output/proba", #argmax
+			   "adjusted": "tune",
+			} 
+
 		all_predictions = []
+		all_logits = []
 		for batch in batches:
 			words_batch, textlen_batch, mentions_batch, mentionlen_batch, positions_batch, labels_batch = zip(*batch)
 			feed = {
@@ -75,12 +96,34 @@ def get_types(model_name, input_file, output_file):
 			}
 			batch_predictions = sess.run(pred_op, feed_dict=feed)
 			all_predictions = np.concatenate([all_predictions, batch_predictions])
-	
+
+
+
+			logit_predictions = sess.run(logit_op, feed_dict=feed)
+			logit_predictions = sess.run(score_op, feed_dict=feed)
+			import pdb; pdb.set_trace()  # breakpoint 5ae84f1f //
+
+			if all_logits == []:
+				all_logits = logit_predictions
+			else:
+				all_logits = np.concatenate([all_logits, logit_predictions])
+
+			# all_logits.append(logit_predictions)
+
+	import pdb; pdb.set_trace()  # breakpoint 276ab118 //
+
+	"""		
 	df["t1"] = all_predictions[:n]
 	df["t2"] = all_predictions[n:]
 	df["t1"] = df["t1"].map(id2type)
 	df["t2"] = df["t2"].map(id2type)
 	df.to_csv(output_file, sep="\t", header=False, index=False)
+
+	np.unique(labels).shape
+	(63,)
+
+
+	"""
 
 def get_embeddings(model_name, output_file):
 	checkpoint_file = os.path.join(config.CHECKPOINT_DIR, model_name)
@@ -96,7 +139,7 @@ def get_embeddings(model_name, output_file):
 
 def main(options):
 	if options.input_file != "":
-		get_types(options.model_name, options.input_file, options.output_file)
+		get_types(options.model_name, options.input_file, options.output_file, options)
 	if options.embedding:
 		get_embeddings(options.model_name, options.output_file)
 

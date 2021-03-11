@@ -22,7 +22,7 @@ class Task:
         if data_name == "wiki":
             words_train, mentions_train, positions_train, labels_train = data_utils.load(config.WIKI_TRAIN_CLEAN)
 
-            words_train, mentions_train, positions_train, labels_train = words_train[:95], mentions_train[:95], positions_train[:95], labels_train[:95]
+            #words_train, mentions_train, positions_train, labels_train = words_train[:95], mentions_train[:95], positions_train[:95], labels_train[:95]
 
             words, mentions, positions, labels = data_utils.load(config.WIKI_TEST_CLEAN)
             type2id, typeDict = pkl_utils._load(config.WIKI_TYPE)
@@ -205,6 +205,48 @@ class Task:
             self.logger.info("\t\t%d\t\t%.3f\t\t%.3f\t\t%.3f" % (epochs, acc, macro, micro))
         sess.close()
 
+    def evaluate_nofit(self, full=False):
+        self.logger.info("Params")
+        self._print_param_dict(self.params_dict)
+        self.logger.info("Final Evaluation")
+        self.logger.info("\t\tRun\t\tAcc\t\tMacro\t\tMicro")
+        accs = []
+        macros = []
+        micros = []
+
+        keep = []
+        for i in range(self.cv_runs):
+            sess = self.create_session()
+            sess.run(tf.global_variables_initializer())
+            import pdb; pdb.set_trace()  # breakpoint 63e438c7 //
+
+            #self.model.fit(sess, self.train_set)
+
+            if full:
+                preds = self.model.predict(sess, self.full_test_set)
+                acc, macro, micro = self.get_scores(preds, True)
+            else:
+                preds = self.model.predict(sess, self.test_set)
+                acc, macro, micro = self.get_scores(preds)
+            accs.append(acc)
+            macros.append(macro)
+            micros.append(micro)
+            sess.close()
+        avg_acc = np.mean(accs)
+        avg_macro = np.mean(macros)
+        avg_micro = np.mean(micros)
+        std_acc = np.std(accs)
+        std_macro = np.std(macros)
+        std_micro = np.std(micros)
+        for i in range(self.cv_runs):
+            self.logger.info("\t\t%d\t\t%.3f\t\t%.3f\t\t%.3f" %
+                    (i + 1, accs[i], macros[i], micros[i]))
+        self.logger.info("-" * 50)
+        self.logger.info("Avg Acc %.3f(+-%.3f) Macro %.3f(+-%.3f) Micro %.3f(+-%.3f)" %
+                (avg_acc, std_acc, avg_macro, std_macro, avg_micro, std_micro))
+
+        return keep
+
     def evaluate(self, full=False):
         self.logger.info("Params")
         self._print_param_dict(self.params_dict)
@@ -213,6 +255,7 @@ class Task:
         accs = []
         macros = []
         micros = []
+
         keep = []
         for i in range(self.cv_runs):
             sess = self.create_session()
@@ -242,6 +285,8 @@ class Task:
         self.logger.info("Avg Acc %.3f(+-%.3f) Macro %.3f(+-%.3f) Micro %.3f(+-%.3f)" %
                 (avg_acc, std_acc, avg_macro, std_macro, avg_micro, std_micro))
 
+        return keep
+
     def save(self):
         sess = self.create_session()
         sess.run(tf.global_variables_initializer())
@@ -249,6 +294,13 @@ class Task:
         path = self.saver.save(sess, self.checkpoint_prefix)
         self.embedding.save(self.checkpoint_prefix)
         print("Saved model to {}".format(path))
+
+    def load(self):
+        sess = self.create_session()
+        self.saver.restore(sess, self.checkpoint_prefix)
+        sess.run(tf.global_variables_initializer())
+        self.embedding.load(self.checkpoint_prefix)
+        print("Opened model {}".format(path))
 
 class TaskOptimizer:
     def __init__(self, model_name, data_name, cv_runs, max_evals, logger):

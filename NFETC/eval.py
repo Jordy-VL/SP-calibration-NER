@@ -31,13 +31,20 @@ def main(options):
         # logging.basicConfig(format='[%(asctime)s] %(levelname)s: %(message)s', level=logging.INFO)
     params_dict = param_space_dict[options.model_name]    
     task = Task(options.model_name, options.data_name, options.runs, params_dict, logger)
+
+
+    import pdb; pdb.set_trace()  # breakpoint 0c37bca4 //
+
+
     if options.save:
         task.save()
     else:
         if options.epoch:
             task.refit()
         else:
-            task.evaluate(options.full)
+            keep = task.evaluate(options.full)
+
+
 
 if __name__ == "__main__":
     parser = OptionParser()
