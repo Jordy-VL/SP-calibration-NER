@@ -8,8 +8,10 @@ import numpy as np
 import pandas as pd
 import pickle
 
-DEV_utils = os.path.realpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', "dev_utils"))
+#DEV_utils = os.path.realpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', "dev_utils"))
+DEV_utils = os.path.realpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../..', "gordon/arkham/arkham/calibration"))
 sys.path.append(DEV_utils)
+print(DEV_utils)
 from evaluator import StructuredLogits, StructuredLogitsStore
 
 def parse_args(parser):
