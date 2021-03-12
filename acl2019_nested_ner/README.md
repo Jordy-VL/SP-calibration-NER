@@ -49,6 +49,10 @@ Could write a script in which to for a CONLL file, output all embeddings
 -> use flair?
 https://github.com/flairNLP/flair/blob/master/resources/docs/TUTORIAL_9_TRAINING_LM_EMBEDDINGS.md
 
+### details
+takes half an hour per epoch [without extra embeddings]
+
+
 <!---
 A text file with one token per
   line, first column is the token, all other columns are the vector real valued
