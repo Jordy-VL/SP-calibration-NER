@@ -104,6 +104,8 @@ def get_types(model_name, input_file, dev_file, output_file, options):
 
         store.create_labelset(StructuredLogits(f_x=all_logits, y_true=test_labels, tokenized=test_tokenized, y_hat=None, probas=None, c=None, document_masks=None, idx2label=id2type),"test")
         store.score_set("test")
+        import pdb; pdb.set_trace()  # breakpoint 6700594a //
+        
 
         dev_batches = data_utils.batch_iter(dev_set, 512, 1, shuffle=False)
 
